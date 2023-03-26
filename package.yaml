@@ -1,0 +1,63 @@
+name: servant-combinators
+version: 0.0.1
+synopsis: Extra servant combinators, to cover some gaps servant has that become evident if you're porting from other web server libraries.
+author: Adam McCullough <merlinfmct87@gmail.com>
+maintainer: Adam McCullough <merlinfmct87@gmail.com>
+copyright: © 2023 Adam McCullough
+license: MIT
+tested-with: GHC == 8.8.4
+
+ghc-options: -Wall -Wwarn -fwarn-tabs
+
+dependencies:
+  - aeson
+  - base
+  - bytestring
+  - clientsession
+  - containers
+  - cookie
+  - http-types
+  - servant
+  - servant-server
+  - text
+  - wai
+
+default-extensions:
+  - DataKinds
+  - FlexibleInstances
+  - MultiParamTypeClasses
+  - OverloadedStrings
+  - ScopedTypeVariables
+  - TypeApplications
+  - TypeFamilies
+  - TypeOperators
+
+executables:
+  live-test:
+    source-dirs:
+      - src
+    main: LiveTest.hs
+    ghc-options:
+    - -threaded
+    other-modules: []
+
+library:
+  source-dirs:
+    - lib
+  exposed-modules:
+    ServantExtras.Cookies
+    ServantExtras.HeaderList
+    ServantExtras.Path
+    ServantExtras.QueryString
+    ServantExtras.RawQueryString
+    ServantExtras.RawRequest
+
+tests:
+  check:
+    dependencies:
+      - hspec
+    ghc-options: -threaded
+    source-dirs:
+      - tests
+    main: TestSuite.hs
+    other-modules: []
