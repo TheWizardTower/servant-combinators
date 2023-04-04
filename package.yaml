@@ -19,7 +19,9 @@ dependencies:
   - http-types
   - servant
   - servant-server
+  - tasty
   - text
+  - QuickCheck
   - vault
   - wai
 
@@ -56,11 +58,20 @@ library:
 tests:
   check:
     dependencies:
-      - hspec
+      - async
+      - case-insensitive
+      - QuickCheck
+      - http-client
+      - http-conduit
       - servant-combinators
+      - tasty
+      - tasty-quickcheck
+      - warp
     ghc-options: -threaded
     source-dirs:
       - tests
     main: Main.hs
     other-modules:
       - TestCookies
+      - TestHeaders
+      - TestLib
