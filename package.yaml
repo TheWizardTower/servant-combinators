@@ -20,6 +20,7 @@ dependencies:
   - servant
   - servant-server
   - text
+  - vault
   - wai
 
 default-extensions:
@@ -45,19 +46,21 @@ library:
   source-dirs:
     - lib
   exposed-modules:
-    ServantExtras.Cookies
-    ServantExtras.HeaderList
-    ServantExtras.Path
-    ServantExtras.QueryString
-    ServantExtras.RawQueryString
-    ServantExtras.RawRequest
+    - ServantExtras.Cookies
+    - ServantExtras.HeaderList
+    - ServantExtras.Path
+    - ServantExtras.QueryString
+    - ServantExtras.RawQueryString
+    - ServantExtras.RawRequest
 
 tests:
   check:
     dependencies:
       - hspec
+      - servant-combinators
     ghc-options: -threaded
     source-dirs:
       - tests
-    main: TestSuite.hs
-    other-modules: []
+    main: Main.hs
+    other-modules:
+      - TestCookies
