@@ -1,6 +1,8 @@
 name: servant-combinators
 version: 0.0.1
-synopsis: Extra servant combinators, to cover some gaps servant has that become evident if you're porting from other web server libraries.
+synopsis: Extra servant combinators for full WAI functionality.
+category: web
+description: Servant covers most of the data in a raw WAI request, but misses a few fields. This library aims to let handler authors get all the information about a request they need.
 author: Adam McCullough <merlinfmct87@gmail.com>
 maintainer: Adam McCullough <merlinfmct87@gmail.com>
 copyright: © 2023 Adam McCullough
@@ -11,7 +13,7 @@ ghc-options: -Wall -Wwarn -fwarn-tabs
 
 dependencies:
   - aeson
-  - base
+  - base >= 4.16 && < 4.17
   - bytestring
   - clientsession
   - containers
