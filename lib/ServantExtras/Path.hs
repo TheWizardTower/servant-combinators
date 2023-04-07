@@ -1,5 +1,6 @@
--- |Description: Provides a combinator to give handlers access to the
--- PathInfo field from the WAI request.
+{- |Description: Provides a combinator to give handlers access to the
+ PathInfo field from the WAI request.
+-}
 module ServantExtras.Path where
 
 import Data.Text (Text)
@@ -7,7 +8,7 @@ import Network.Wai
 import Servant
 import Servant.Server.Internal.Delayed (passToServer)
 
-{-|
+{- |
   @PathInfo@ provides the `Network.Wai.pathInfo` field from the WAI request.
 
   Example:

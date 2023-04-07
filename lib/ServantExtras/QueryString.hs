@@ -1,5 +1,6 @@
--- |Description: Combinator for Servant to allow Handlers access to the full query
--- string from the WAI request.
+{- |Description: Combinator for Servant to allow Handlers access to the full query
+ string from the WAI request.
+-}
 module ServantExtras.QueryString where
 
 import Network.HTTP.Types (Query)
@@ -7,7 +8,7 @@ import Network.Wai
 import Servant
 import Servant.Server.Internal.Delayed (passToServer)
 
-{-|
+{- |
   @QueryString@ provides handlers access to the full query string from
   the WAI request, rather than pulling each element explicitly. This
   allows for dynamic query management, or to simply take in many

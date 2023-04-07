@@ -1,6 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
--- |Description: This module provides access to cookie data, in the
--- form of a SessionMap.
+
+{- |Description: This module provides access to cookie data, in the
+ form of a SessionMap.
+-}
 module ServantExtras.Cookies where
 
 import Data.ByteString (ByteString)
@@ -34,7 +36,7 @@ type SessionMap = Map ByteString ByteString
 -}
 data ProvideCookies (mods :: [Type])
 
-{-|
+{- |
   As mentioned above, the @WithCookies@ combinator provides
   already-parsed cookies to the handler as a SessionMap.
 
@@ -75,7 +77,7 @@ myServer = cookieEndpointHandler
 -}
 data WithCookies (mods :: [Type])
 
-{-|
+{- |
   @HasCookies@ and @HasCookiesMaybe@ are internal utitily types. You should only need to use @ProvideCookies@ and @WithCookies@.
 
   As an aside, they're separate types (rather than a single type with
@@ -86,7 +88,7 @@ data WithCookies (mods :: [Type])
 -}
 data HasCookies = HasCookies
 
-{-|
+{- |
   @HasCookies@ and @HasCookiesMaybe@ are internal utitily types. You should only need to use @ProvideCookies@ and @WithCookies@.
 -}
 data HasCookiesMaybe = HasCookiesMaybe
@@ -181,12 +183,12 @@ instance
           Nothing ->
             delayedFailFatal $
               err500
-                -- TODO: Maybe the error message should be pulled from
-                -- the Context?
-                { errBody = "Something has gone horribly wrong; could not find cached cookies."
+                { -- TODO: Maybe the error message should be pulled from
+                  -- the Context?
+                  errBody = "Something has gone horribly wrong; could not find cached cookies."
                 }
 
-{-|
+{- |
   This function takes a SessionMap and provides a "Set-Cookie" header
   to set the SessionData to a newly minted value of your choice.
 -}
@@ -211,7 +213,7 @@ updateCookies cookieEncryptKey sessionMap setCookieDefaults value = do
 
   pure $ addHeader setCookie value
 
-{-|
+{- |
   This function clears session data, for a fresh, minty-clean
   experience. The archetypal use case is when a user logs out from
   your server.

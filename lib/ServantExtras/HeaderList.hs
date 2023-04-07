@@ -1,5 +1,6 @@
--- |Description: This module provides a way to get _all_ the headers
--- from a request, rather than asking for them piecemeal.
+{- |Description: This module provides a way to get _all_ the headers
+ from a request, rather than asking for them piecemeal.
+-}
 module ServantExtras.HeaderList where
 
 import Network.Wai
@@ -8,7 +9,7 @@ import Servant.Server.Internal.Delayed (passToServer)
 
 import qualified Network.HTTP.Types.Header as NTH (Header)
 
-{-|
+{- |
   The HeaderList combinator provides a list of
   @Network.HTTP.Types.Header.Header@ values from the WAI request.
 

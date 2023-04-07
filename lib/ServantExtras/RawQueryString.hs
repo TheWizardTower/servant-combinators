@@ -1,5 +1,6 @@
--- |Description: Provides a combinator to access the Query String in
--- its raw form, from the WAI request.
+{- |Description: Provides a combinator to access the Query String in
+ its raw form, from the WAI request.
+-}
 module ServantExtras.RawQueryString where
 
 import Data.ByteString (ByteString)
@@ -7,7 +8,7 @@ import Network.Wai
 import Servant
 import Servant.Server.Internal.Delayed (passToServer)
 
-{-|
+{- |
   @RawQueryString@ gives handler authors a combinator to access the raw
   (that is, un-parsed) query string from the WAI request, as a
   ByteString.
