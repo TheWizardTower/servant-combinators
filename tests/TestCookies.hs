@@ -11,14 +11,13 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import Network.HTTP.Client (method)
 import Network.Wai
-import Network.Wai.Handler.Warp (run)
 import Servant
 import Servant.Server.Internal.Delayed (addAcceptCheck)
 import Servant.Server.Internal.DelayedIO (DelayedIO, delayedFailFatal, withRequest)
 import ServantExtras.Cookies
 import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
 import Test.Tasty
-import TestLib (returns400, success, testFunctionGeneric)
+import TestLib (returns400, success)
 import Web.Cookie
 
 import qualified Data.Map.Strict as Map
@@ -57,7 +56,7 @@ instance
                 { errBody = "TEST_COOKIE cookie not set."
                 }
 
-type TestAPI =
+type CookieAPI =
   ProvideCookies '[Required]
     :> ( "add-cookie"
           :> Get '[JSON] (Headers '[Header "Set-Cookie" SetCookie] NoContent)
@@ -67,8 +66,8 @@ type TestAPI =
             :> Get '[JSON] (Map Text Text)
        )
 
-testServer :: Server TestAPI
-testServer = addCookie :<|> showCookie
+cookieServer :: Server CookieAPI
+cookieServer = addCookie :<|> showCookie
   where
     addCookie :: Handler (Headers '[Header "Set-Cookie" SetCookie] NoContent)
     addCookie =
@@ -83,20 +82,6 @@ testServer = addCookie :<|> showCookie
     showCookie sMap = do
       let kvs = Map.toList sMap
       pure $ Map.fromList $ fmap (bimap decodeUtf8 decodeUtf8) kvs
-
-mkTestApplication :: IO Application
-mkTestApplication = do
-  key <- Vault.newKey :: IO (Vault.Key SessionMap)
-  pure $
-    serveWithContext
-      (Proxy @TestAPI)
-      (key :. EmptyContext)
-      testServer
-
-runCookieServer :: Int -> IO ()
-runCookieServer port = do
-  app <- mkTestApplication
-  run port app
 
 cookieProps :: Int -> TestTree
 cookieProps port =
@@ -144,6 +129,3 @@ cookieProps port =
        in do
             resp <- S.httpBS req
             pure resp
-
-testFunction :: Int -> IO ()
-testFunction port = testFunctionGeneric runCookieServer cookieProps port

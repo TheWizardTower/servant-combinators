@@ -1,16 +1,13 @@
 module TestHeaders where
 
-import Control.Exception (throw)
-import Control.Monad.IO.Class (liftIO)
 import Data.ByteString (ByteString)
 import Data.CaseInsensitive (mk)
 import Network.HTTP.Client (method)
-import Network.Wai.Handler.Warp (run)
 import Servant
 import ServantExtras.HeaderList
 import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
 import Test.Tasty
-import TestLib (returns400, success, testFunctionGeneric)
+import TestLib (returns400, success)
 
 import qualified Network.HTTP.Simple as S
 import qualified Network.HTTP.Types.Header as NTH
@@ -27,13 +24,14 @@ myHeaderList =
     , "FOOBAR"
     )
   ]
-type TestAPI =
+
+type HeaderAPI =
   "check-headers"
     :> HeaderList
     :> Get '[JSON] NoContent
 
-testServer :: Server TestAPI
-testServer = checkHeader
+headerServer :: Server HeaderAPI
+headerServer = checkHeader
   where
     checkHeader :: [NTH.Header] -> Handler NoContent
     checkHeader headers = do
@@ -43,19 +41,6 @@ testServer = checkHeader
           pure NoContent
         False -> do
           throwError err400
-
-mkTestApplication :: IO Application
-mkTestApplication = do
-  pure $
-    serve
-      (Proxy @TestAPI)
-      -- (key :. EmptyContext)
-      testServer
-
-runHeaderServer :: Int -> IO ()
-runHeaderServer port = do
-  app <- mkTestApplication
-  run port app
 
 headerProps :: Int -> TestTree
 headerProps port =
@@ -84,6 +69,3 @@ headerProps port =
       in  do
             resp <- S.httpBS req
             pure resp
-
-testFunction :: Int -> IO ()
-testFunction port = testFunctionGeneric runHeaderServer headerProps port
