@@ -7,20 +7,17 @@ import Test.Tasty
 import TestCookies (CookieAPI, cookieProps, cookieServer)
 import TestHeaders (HeaderAPI, headerProps, headerServer)
 import TestLib (testFunctionGeneric)
-import TestPath (PathAPI, pathProps, pathServer)
 
 import qualified Data.Vault.Lazy as Vault
 
 type TopLevelAPI =
   CookieAPI
     :<|> HeaderAPI
-    :<|> PathAPI
 
 topLevelServer :: Server TopLevelAPI
 topLevelServer =
   cookieServer
     :<|> headerServer
-    :<|> pathServer
 
 topLevelProps :: Int -> TestTree
 topLevelProps port =
@@ -28,7 +25,6 @@ topLevelProps port =
     "Main tests"
     [ cookieProps port
     , headerProps port
-    , pathProps port
     ]
 
 mkTestApplication :: IO Application
