@@ -77,3 +77,4 @@ tests:
       - TestCookies
       - TestHeaders
       - TestLib
+      - TestPath
