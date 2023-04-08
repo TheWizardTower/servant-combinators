@@ -52,7 +52,6 @@ library:
   exposed-modules:
     - ServantExtras.Cookies
     - ServantExtras.HeaderList
-    - ServantExtras.Path
     - ServantExtras.QueryString
     - ServantExtras.RawQueryString
     - ServantExtras.RawRequest
