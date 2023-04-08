@@ -3,7 +3,7 @@
 {- |Description: This module provides access to cookie data, in the
  form of a SessionMap.
 -}
-module ServantExtras.Cookies where
+module Servant.API.Cookies where
 
 import Data.ByteString (ByteString)
 import Data.Functor ((<&>))

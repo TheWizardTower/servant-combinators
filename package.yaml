@@ -50,11 +50,11 @@ library:
   source-dirs:
     - lib
   exposed-modules:
-    - ServantExtras.Cookies
-    - ServantExtras.HeaderList
-    - ServantExtras.QueryString
-    - ServantExtras.RawQueryString
-    - ServantExtras.RawRequest
+    - Servant.API.Cookies
+    - Servant.API.HeaderList
+    - Servant.API.QueryString
+    - Servant.API.RawQueryString
+    - Servant.API.RawRequest
 
 tests:
   check:

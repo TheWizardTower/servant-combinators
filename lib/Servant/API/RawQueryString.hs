@@ -1,7 +1,7 @@
 {- |Description: Provides a combinator to access the Query String in
  its raw form, from the WAI request.
 -}
-module ServantExtras.RawQueryString where
+module Servant.API.RawQueryString where
 
 import Data.ByteString (ByteString)
 import Network.Wai

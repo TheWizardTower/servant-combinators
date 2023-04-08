@@ -1,7 +1,7 @@
 {- |Description: Provide a combinator to give handlers access to the
  raw WAI request.
 -}
-module ServantExtras.RawRequest where
+module Servant.API.RawRequest where
 
 import Network.Wai
 import Servant

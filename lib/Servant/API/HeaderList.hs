@@ -1,7 +1,7 @@
 {- |Description: This module provides a way to get _all_ the headers
  from a request, rather than asking for them piecemeal.
 -}
-module ServantExtras.HeaderList where
+module Servant.API.HeaderList where
 
 import Network.Wai
 import Servant

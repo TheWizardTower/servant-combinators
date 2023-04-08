@@ -1,7 +1,7 @@
 {- |Description: Combinator for Servant to allow Handlers access to the full query
  string from the WAI request.
 -}
-module ServantExtras.QueryString where
+module Servant.API.QueryString where
 
 import Network.HTTP.Types (Query)
 import Network.Wai

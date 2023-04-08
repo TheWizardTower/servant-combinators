@@ -4,7 +4,7 @@ import Data.ByteString (ByteString)
 import Data.CaseInsensitive (mk)
 import Network.HTTP.Client (method)
 import Servant
-import ServantExtras.HeaderList
+import Servant.API.HeaderList
 import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
 import Test.Tasty
 import TestLib (returns400, success)

@@ -2,7 +2,7 @@ module Main where
 
 import Network.Wai.Handler.Warp (run)
 import Servant
-import ServantExtras.Cookies (SessionMap)
+import Servant.API.Cookies (SessionMap)
 import Test.Tasty
 import TestCookies (CookieAPI, cookieProps, cookieServer)
 import TestHeaders (HeaderAPI, headerProps, headerServer)

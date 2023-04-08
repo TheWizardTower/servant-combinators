@@ -14,7 +14,7 @@ import Network.Wai
 import Servant
 import Servant.Server.Internal.Delayed (addAcceptCheck)
 import Servant.Server.Internal.DelayedIO (DelayedIO, delayedFailFatal, withRequest)
-import ServantExtras.Cookies
+import Servant.API.Cookies
 import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
 import Test.Tasty
 import TestLib (returns400, success)
