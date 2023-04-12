@@ -92,7 +92,7 @@ cookieProps :: Key -> Int -> TestTree
 cookieProps encKey port =
   testGroup
     "Cookies"
-    [ QC.testProperty "Fetching a non-existent cookie returns a 500." $
+    [ QC.testProperty "Fetching a non-existent cookie returns a 400" $
         monadicIO $ do
           result <- (fetchCheckCookieEndpoint port Nothing) >>= returns400
           assert $ result == True
