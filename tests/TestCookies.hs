@@ -96,7 +96,7 @@ cookieProps encKey port =
         monadicIO $ do
           result <- (fetchCheckCookieEndpoint port Nothing) >>= returns400
           assert $ result == True
-    , QC.testProperty "Calling add-cookie returns a 200, and adds a Set-Cookie header." $
+    , QC.testProperty "Calling add-cookie returns a 200, and adds a Set-Cookie header" $
         monadicIO $ do
           res1 <- (fetchCreateCookieEndpoint port)
           assert1 <- success res1
@@ -105,7 +105,7 @@ cookieProps encKey port =
               setCookieParsed = setCookieValue . parseSetCookie <$> setCookieStr
               sCookieVal = setCookieParsed >>= decrypt encKey
           assert $ sCookieVal == Just "TEST_COOKIE=FOOBAR"
-    , QC.testProperty "Fetching the create-cookie, then check-cookie endpoints should work." $
+    , QC.testProperty "Fetching the create-cookie, then check-cookie endpoints should work" $
         monadicIO $ do
           res1 <- fetchCreateCookieEndpoint port
           assert1 <- success res1

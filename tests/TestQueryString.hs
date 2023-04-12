@@ -39,7 +39,7 @@ queryStrProps :: Int -> TestTree
 queryStrProps port =
   testGroup
     "QueryString"
-    [ QC.testProperty "Query flags should have a 'Nothing' as a value." $
+    [ QC.testProperty "Query flags should have a 'Nothing' as a value" $
         monadicIO $ do
           result <- (fetchEndpoint port "flag" "") >>= success
           assert $ result == True

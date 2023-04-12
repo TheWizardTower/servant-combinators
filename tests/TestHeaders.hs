@@ -50,7 +50,7 @@ headerProps port =
         monadicIO $ do
           result <- (fetchHeaderEndpoint port Nothing) >>= returns400
           assert $ result == True
-    , QC.testProperty "The endpoint should return a 200 if a header is added." $
+    , QC.testProperty "The endpoint should return a 200 if a header is added" $
         monadicIO $ do
           result <- (fetchHeaderEndpoint port (Just $ myHeaderList)) >>= success
           assert $ result == True
