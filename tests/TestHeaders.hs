@@ -52,20 +52,22 @@ headerProps port =
           assert $ result == True
     , QC.testProperty "The endpoint should return a 200 if a header is added." $
         monadicIO $ do
-          result <- (fetchHeaderEndpoint port (Just myHeaderList)) >>= success
+          result <- (fetchHeaderEndpoint port (Just $ myHeaderList)) >>= success
           assert $ result == True
     ]
   where
     fetchHeaderEndpoint :: Int -> Maybe [NTH.Header] -> PropertyM IO (S.Response ByteString)
     fetchHeaderEndpoint port' mHeaderList =
-      let initReq =
-            S.parseRequest_ $
-              "http://localhost:"
-                <> (show port')
-                <> "/check-headers"
-          headerList = maybe [] id mHeaderList
-          reqHeader = S.setRequestHeaders headerList initReq
-          req = reqHeader {method = "GET"}
-      in  do
-            resp <- S.httpBS req
-            pure resp
+      let
+        initReq =
+          S.parseRequest_ $
+            "http://localhost:"
+              <> (show port')
+              <> "/check-headers"
+        headerList = maybe [] id mHeaderList
+        reqHeader = S.setRequestHeaders headerList initReq
+        req = reqHeader {method = "GET"}
+      in
+        do
+          resp <- S.httpBS req
+          pure resp

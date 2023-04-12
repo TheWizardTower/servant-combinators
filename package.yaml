@@ -23,6 +23,7 @@ dependencies:
   - servant-server
   - tasty
   - text
+  - time
   - QuickCheck
   - vault
   - wai

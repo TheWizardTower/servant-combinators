@@ -7,6 +7,7 @@ import Test.Tasty
 import TestCookies (CookieAPI, cookieProps, cookieServer)
 import TestHeaders (HeaderAPI, headerProps, headerServer)
 import TestLib (testFunctionGeneric)
+import Web.ClientSession
 
 import qualified Data.Vault.Lazy as Vault
 
@@ -14,33 +15,34 @@ type TopLevelAPI =
   CookieAPI
     :<|> HeaderAPI
 
-topLevelServer :: Server TopLevelAPI
-topLevelServer =
-  cookieServer
+topLevelServer :: Key -> Server TopLevelAPI
+topLevelServer encKey =
+  cookieServer encKey
     :<|> headerServer
 
-topLevelProps :: Int -> TestTree
-topLevelProps port =
+topLevelProps :: Key -> Int -> TestTree
+topLevelProps key port =
   testGroup
     "Main tests"
-    [ cookieProps port
+    [ cookieProps key port
     , headerProps port
     ]
 
-mkTestApplication :: IO Application
-mkTestApplication = do
+mkTestApplication :: Key -> IO Application
+mkTestApplication encKey = do
   key <- Vault.newKey :: IO (Vault.Key SessionMap)
   pure $
     serveWithContext
       (Proxy @TopLevelAPI)
-      (key :. EmptyContext)
-      topLevelServer
+      (encKey :. key :. EmptyContext)
+      (topLevelServer encKey)
 
-runTopLevelServer :: Int -> IO ()
-runTopLevelServer port = do
-  app <- mkTestApplication
+runTopLevelServer :: Key -> Int -> IO ()
+runTopLevelServer key port = do
+  app <- mkTestApplication key
   run port app
 
 main :: IO ()
-main =
-  testFunctionGeneric runTopLevelServer topLevelProps 8080
+main = do
+  (_initKeyBS, encKey) <- randomKey
+  testFunctionGeneric (runTopLevelServer encKey) (topLevelProps encKey) 8080

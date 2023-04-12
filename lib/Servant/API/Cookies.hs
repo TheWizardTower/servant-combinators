@@ -9,8 +9,7 @@ import Data.ByteString (ByteString)
 import Data.Functor ((<&>))
 import Data.Kind (Type)
 import Data.Map.Strict (Map)
-import Data.Text
-import Data.Text.Encoding (decodeUtf8)
+import Data.Time.Clock (getCurrentTime, secondsToDiffTime)
 import Network.Wai
 import Servant
 import Servant.Server.Internal.Delayed (addHeaderCheck)
@@ -18,8 +17,6 @@ import Servant.Server.Internal.DelayedIO (DelayedIO, delayedFailFatal, withReque
 import Web.ClientSession
 import Web.Cookie
 
-import qualified Data.Aeson as Aeson
-import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map.Strict as Map
 import qualified Data.Vault.Lazy as Vault
 import qualified Network.HTTP.Types.Header as NTH
@@ -40,9 +37,9 @@ data ProvideCookies (mods :: [Type])
   As mentioned above, the @WithCookies@ combinator provides
   already-parsed cookies to the handler as a SessionMap.
 
-  A potentially relevant note: the cookie data is sent to the client
-  _unencrypted_. If you need to encrypt your data, you'll need to use
-  a different combinator.
+  The cookie values are assumed to be encrypted with a
+  @Web.ClientSession.Key@. Likewise, @updateCookies@ encrypts the
+  cookies on the outbound side via this mechanism.
 
   Example:
 
@@ -96,6 +93,7 @@ data HasCookiesMaybe = HasCookiesMaybe
 instance
   ( HasServer api (HasCookies ': ctx)
   , HasContextEntry ctx (Vault.Key SessionMap)
+  , HasContextEntry ctx (Key) -- for encrypting/decrypting the cookie
   ) =>
   HasServer (ProvideCookies '[Required] :> api) ctx
   where
@@ -108,14 +106,17 @@ instance
     route (Proxy @api) (HasCookies :. ctx) server <&> \app req respK -> do
       let
         mCookie = lookup NTH.hCookie (requestHeaders req)
-        cookies = maybe Map.empty (Map.fromList . parseCookies) mCookie
         key = getContextEntry ctx :: Vault.Key SessionMap
+        encKey = getContextEntry ctx :: Key
+        mCookie' = mCookie >>= (decrypt encKey)
+        cookies = maybe Map.empty (Map.fromList . parseCookies) mCookie'
         req' = req {vault = Vault.insert key cookies (vault req)}
       app req' respK
 
 instance
   ( HasServer api (HasCookiesMaybe ': ctx)
   , HasContextEntry ctx (Vault.Key (Maybe SessionMap))
+  , HasContextEntry ctx (Key) -- for encrypting/decrypting the cookie
   ) =>
   HasServer (ProvideCookies '[Optional] :> api) ctx
   where
@@ -192,22 +193,27 @@ instance
   This function takes a SessionMap and provides a "Set-Cookie" header
   to set the SessionData to a newly minted value of your choice.
 -}
-updateCookies :: Key -> SessionMap -> SetCookie -> a -> IO (Headers '[Servant.Header "Set-Cookie" SetCookie] a)
--- updateCookies :: _
-updateCookies cookieEncryptKey sessionMap setCookieDefaults value = do
+updateCookies ::
+  Key ->
+  SessionMap ->
+  SetCookie ->
+  ByteString ->
+  a ->
+  IO (Headers '[Servant.Header "Set-Cookie" SetCookie] a)
+updateCookies cookieEncryptKey sessionMap setCookieDefaults cookieName value = do
   -- let newCookies = newMap `Map.difference` oldMap
   --     changedCookies = Map.filterWithKey (checkIfMapValueChanged oldMap) oldMap
   --     setCookieList = fmap snd  $ Map.toList $ Map.mapWithKey (keyValueToSetCookie setCookieDefaults) changedCookies
   let
-    sessionMapOfText :: Map Text Text
-    sessionMapOfText = Map.fromList $ fmap (\(k, v) -> (decodeUtf8 k, decodeUtf8 v)) $ Map.toList sessionMap
-    sessionMapBS :: ByteString
-    sessionMapBS = LBS.toStrict $ Aeson.encode sessionMapOfText
-  sessionMapEncrypted <- encryptIO cookieEncryptKey sessionMapBS
+    cookieBS :: ByteString
+    cookieBS = renderCookiesBS $ Map.toList sessionMap
+
+  sessionMapEncrypted <- encryptIO cookieEncryptKey cookieBS
+
   let
     setCookie =
       setCookieDefaults
-        { setCookieName = "something intelligent here"
+        { setCookieName = cookieName
         , setCookieValue = sessionMapEncrypted
         }
 
@@ -220,15 +226,14 @@ updateCookies cookieEncryptKey sessionMap setCookieDefaults value = do
 -}
 clearSession :: SetCookie -> a -> IO (Headers '[Servant.Header "SetCookie" SetCookie] a)
 clearSession setCookieDefaults value = do
+  now <- getCurrentTime
   let
-    myEmptyMap :: Map Text Text
-    myEmptyMap = Map.empty
-
-    emptyObjectBS = LBS.toStrict $ Aeson.encode myEmptyMap
-
+    immediateMaxAge = secondsToDiffTime 0
     setCookie =
       setCookieDefaults
-        { setCookieName = "something intelligent here"
-        , setCookieValue = emptyObjectBS
+        { setCookieName = ""
+        , setCookieValue = ""
+        , setCookieExpires = Just now
+        , setCookieMaxAge = Just immediateMaxAge
         }
   pure $ addHeader setCookie value

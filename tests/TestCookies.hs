@@ -3,6 +3,7 @@
 
 module TestCookies where
 
+import Control.Monad.IO.Class (liftIO)
 import Data.Bifunctor (bimap)
 import Data.ByteString (ByteString)
 import Data.CaseInsensitive (mk)
@@ -12,12 +13,13 @@ import Data.Text.Encoding (decodeUtf8)
 import Network.HTTP.Client (method)
 import Network.Wai
 import Servant
+import Servant.API.Cookies
 import Servant.Server.Internal.Delayed (addAcceptCheck)
 import Servant.Server.Internal.DelayedIO (DelayedIO, delayedFailFatal, withRequest)
-import Servant.API.Cookies
 import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
 import Test.Tasty
 import TestLib (returns400, success)
+import Web.ClientSession
 import Web.Cookie
 
 import qualified Data.Map.Strict as Map
@@ -66,25 +68,28 @@ type CookieAPI =
             :> Get '[JSON] (Map Text Text)
        )
 
-cookieServer :: Server CookieAPI
-cookieServer = addCookie :<|> showCookie
+cookieServer :: Key -> Server CookieAPI
+cookieServer key = addCookie key :<|> showCookie
   where
-    addCookie :: Handler (Headers '[Header "Set-Cookie" SetCookie] NoContent)
-    addCookie =
-      let cookie =
-            defaultSetCookie
-              { setCookieName = "TEST_COOKIE"
-              , setCookieValue = "FOOBAR"
-              }
-      in  pure $ addHeader cookie NoContent
+    addCookie :: Key -> Handler (Headers '[Header "Set-Cookie" SetCookie] NoContent)
+    addCookie keyArg =
+      let sMap =
+            Map.fromList [("TEST_COOKIE", "FOOBAR")]
+      in  liftIO $
+            updateCookies
+              keyArg
+              sMap
+              defaultSetCookie
+              "servant_cookie"
+              NoContent
 
     showCookie :: SessionMap -> Handler (Map Text Text)
     showCookie sMap = do
       let kvs = Map.toList sMap
       pure $ Map.fromList $ fmap (bimap decodeUtf8 decodeUtf8) kvs
 
-cookieProps :: Int -> TestTree
-cookieProps port =
+cookieProps :: Key -> Int -> TestTree
+cookieProps encKey port =
   testGroup
     "Cookies"
     [ QC.testProperty "Fetching a non-existent cookie returns a 500." $
@@ -96,16 +101,19 @@ cookieProps port =
           res1 <- (fetchCreateCookieEndpoint port)
           assert1 <- success res1
           assert $ assert1 == True
-          let setCookieVal = lookup NTH.hSetCookie $ S.getResponseHeaders res1
-          assert $ setCookieVal == Just "TEST_COOKIE=FOOBAR"
+          let setCookieStr = lookup NTH.hSetCookie $ S.getResponseHeaders res1
+              setCookieParsed = setCookieValue . parseSetCookie <$> setCookieStr
+              sCookieVal = setCookieParsed >>= decrypt encKey
+          assert $ sCookieVal == Just "TEST_COOKIE=FOOBAR"
     , QC.testProperty "Fetching the create-cookie, then check-cookie endpoints should work." $
         monadicIO $ do
           res1 <- fetchCreateCookieEndpoint port
           assert1 <- success res1
           assert $ assert1 == True
+          encCookieVal <- liftIO $ encryptIO encKey "TEST_COOKIE=FOOBAR"
           let
             cookieHeader :: [NTH.Header]
-            cookieHeader = [((mk "Cookie" :: NTH.HeaderName), "TEST_COOKIE=FOOBAR")]
+            cookieHeader = [((mk "Cookie" :: NTH.HeaderName), encCookieVal)]
           res2 <- fetchCheckCookieEndpoint port $ Just cookieHeader
           assert2 <- success res2
           assert $ assert2 == True
