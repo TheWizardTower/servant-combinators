@@ -8,6 +8,7 @@ import TestCookies (CookieAPI, cookieProps, cookieServer)
 import TestHeaders (HeaderAPI, headerProps, headerServer)
 import TestLib (testFunctionGeneric)
 import TestQueryString (QueryStrAPI, queryStrProps, queryStrServer)
+import TestRawQueryString (RawQueryStrAPI, rawQueryStrProps, rawQueryStrServer)
 import Web.ClientSession
 
 import qualified Data.Vault.Lazy as Vault
@@ -16,12 +17,14 @@ type TopLevelAPI =
   CookieAPI
     :<|> HeaderAPI
     :<|> QueryStrAPI
+    :<|> RawQueryStrAPI
 
 topLevelServer :: Key -> Server TopLevelAPI
 topLevelServer encKey =
   cookieServer encKey
     :<|> headerServer
     :<|> queryStrServer
+    :<|> rawQueryStrServer
 
 topLevelProps :: Key -> Int -> TestTree
 topLevelProps key port =
@@ -30,6 +33,7 @@ topLevelProps key port =
     [ cookieProps key port
     , headerProps port
     , queryStrProps port
+    , rawQueryStrProps port
     ]
 
 mkTestApplication :: Key -> IO Application
