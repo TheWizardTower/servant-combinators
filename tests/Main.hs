@@ -9,6 +9,7 @@ import TestHeaders (HeaderAPI, headerProps, headerServer)
 import TestLib (testFunctionGeneric)
 import TestQueryString (QueryStrAPI, queryStrProps, queryStrServer)
 import TestRawQueryString (RawQueryStrAPI, rawQueryStrProps, rawQueryStrServer)
+import TestRawRequest (RawRequestAPI, rawRequestProps, rawRequestServer)
 import Web.ClientSession
 
 import qualified Data.Vault.Lazy as Vault
@@ -18,6 +19,7 @@ type TopLevelAPI =
     :<|> HeaderAPI
     :<|> QueryStrAPI
     :<|> RawQueryStrAPI
+    :<|> RawRequestAPI
 
 topLevelServer :: Key -> Server TopLevelAPI
 topLevelServer encKey =
@@ -25,6 +27,7 @@ topLevelServer encKey =
     :<|> headerServer
     :<|> queryStrServer
     :<|> rawQueryStrServer
+    :<|> rawRequestServer
 
 topLevelProps :: Key -> Int -> TestTree
 topLevelProps key port =
@@ -34,6 +37,7 @@ topLevelProps key port =
     , headerProps port
     , queryStrProps port
     , rawQueryStrProps port
+    , rawRequestProps port
     ]
 
 mkTestApplication :: Key -> IO Application
