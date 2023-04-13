@@ -6,6 +6,8 @@
 module Servant.API.Cookies where
 
 import Data.ByteString (ByteString)
+import Data.ByteString.Lazy (toStrict)
+import Data.ByteString.Builder (toLazyByteString)
 import Data.Functor ((<&>))
 import Data.Kind (Type)
 import Data.Map.Strict (Map)
@@ -23,6 +25,16 @@ import qualified Network.HTTP.Types.Header as NTH
 
 -- |A SessionMap is a hash map of session data from a request.
 type SessionMap = Map ByteString ByteString
+
+{- |
+  A SetCookieHeader is a convenience type for adding a "Set-Cookie"
+  header that expects a SetCookie record type.
+
+  I wanted to have the header name be NTH.hSetCookie for extra "use
+  the known correct value" goodness, but that breaks the type magic
+  Servant relies upon.
+-}
+type SetCookieHeader a = Headers '[Servant.Header "Set-Cookie" SetCookie] a
 
 {- |
   The @ProvideCookies@ and @WithCookies@ combinator work in tandem
@@ -199,7 +211,7 @@ updateCookies ::
   SetCookie ->
   ByteString ->
   a ->
-  IO (Headers '[Servant.Header "Set-Cookie" SetCookie] a)
+  IO (SetCookieHeader a)
 updateCookies cookieEncryptKey sessionMap setCookieDefaults cookieName value = do
   -- let newCookies = newMap `Map.difference` oldMap
   --     changedCookies = Map.filterWithKey (checkIfMapValueChanged oldMap) oldMap
@@ -224,7 +236,7 @@ updateCookies cookieEncryptKey sessionMap setCookieDefaults cookieName value = d
   experience. The archetypal use case is when a user logs out from
   your server.
 -}
-clearSession :: SetCookie -> a -> IO (Headers '[Servant.Header "SetCookie" SetCookie] a)
+clearSession :: SetCookie -> a -> IO (SetCookieHeader a)
 clearSession setCookieDefaults value = do
   now <- getCurrentTime
   let

@@ -61,7 +61,7 @@ instance
 type CookieAPI =
   ProvideCookies '[Required]
     :> ( "add-cookie"
-          :> Get '[JSON] (Headers '[Header "Set-Cookie" SetCookie] NoContent)
+          :> Get '[JSON] (SetCookieHeader NoContent)
           :<|> "check-cookies"
             :> CheckTestCookie
             :> WithCookies '[Required]
@@ -71,7 +71,7 @@ type CookieAPI =
 cookieServer :: Key -> Server CookieAPI
 cookieServer key = addCookie key :<|> showCookie
   where
-    addCookie :: Key -> Handler (Headers '[Header "Set-Cookie" SetCookie] NoContent)
+    addCookie :: Key -> Handler (SetCookieHeader NoContent)
     addCookie keyArg =
       let sMap =
             Map.fromList [("TEST_COOKIE", "FOOBAR")]
