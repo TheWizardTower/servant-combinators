@@ -217,6 +217,12 @@ updateCookies cookieEncryptKey sessionMap setCookieDefaults cookieName value = d
   --     changedCookies = Map.filterWithKey (checkIfMapValueChanged oldMap) oldMap
   --     setCookieList = fmap snd  $ Map.toList $ Map.mapWithKey (keyValueToSetCookie setCookieDefaults) changedCookies
   let
+    -- We use renderCookies with a long laborious function chain to
+    -- avoid depending on the version of Web.Cookie that has the
+    -- @renderCookiesBS@ function, which was introduced in a very
+    -- recent of the cookies library. The prod code I'm writing this
+    -- library for is still on lts-18.27, so I take some extra pains
+    -- to still support that release.
     cookieBS :: ByteString
     cookieBS = toStrict . toLazyByteString . renderCookies $ Map.toList sessionMap
 
