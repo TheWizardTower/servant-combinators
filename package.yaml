@@ -7,6 +7,7 @@ author: Adam McCullough <merlinfmct87@gmail.com>
 maintainer: Adam McCullough <merlinfmct87@gmail.com>
 copyright: © 2023 Adam McCullough
 license: MIT
+github: TheWizardTower/servant-combinators
 tested-with: GHC == 8.8.4
            , GHC == 9.2.4
 
