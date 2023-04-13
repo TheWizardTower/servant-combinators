@@ -3,7 +3,7 @@ module TestLib where
 import Control.Concurrent (threadDelay)
 import Control.Concurrent.Async (cancel, withAsync)
 import Data.ByteString (ByteString)
-import Test.QuickCheck.Monadic (PropertyM (..), assert, monadicIO)
+import Test.QuickCheck.Monadic (PropertyM (..))
 import Test.Tasty
 
 import qualified Network.HTTP.Simple as S
