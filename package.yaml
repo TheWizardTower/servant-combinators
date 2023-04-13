@@ -8,12 +8,13 @@ maintainer: Adam McCullough <merlinfmct87@gmail.com>
 copyright: © 2023 Adam McCullough
 license: MIT
 tested-with: GHC == 8.8.4
+           , GHC == 9.2.4
 
 ghc-options: -Wall -Wwarn -fwarn-tabs
 
 dependencies:
   - aeson
-  - base >= 4.16 && < 4.17
+  - base >= 4.14 && < 4.17
   - bytestring
   - clientsession
   - containers

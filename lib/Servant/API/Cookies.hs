@@ -218,7 +218,7 @@ updateCookies cookieEncryptKey sessionMap setCookieDefaults cookieName value = d
   --     setCookieList = fmap snd  $ Map.toList $ Map.mapWithKey (keyValueToSetCookie setCookieDefaults) changedCookies
   let
     cookieBS :: ByteString
-    cookieBS = renderCookiesBS $ Map.toList sessionMap
+    cookieBS = toStrict . toLazyByteString . renderCookies $ Map.toList sessionMap
 
   sessionMapEncrypted <- encryptIO cookieEncryptKey cookieBS
 
