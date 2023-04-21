@@ -10,8 +10,11 @@ import Servant.Server.Internal.Delayed (passToServer)
 
 {- |
   @RawPathInfo@ provides handlers access to the raw, unparsed path
-  information the WAI request. This can be helpful, as by default the
-  servant code replaces the @pathInfo@ values for routed endpoints.
+  information the WAI request.
+
+  If you wish to get the path segments, you can either use the
+  @PathInfo@ combinator in @Servant.API.PathInfo@ or parse it yourself
+  with @Network.HTTP.Types.decodePathSegments@
 
   Example:
 
@@ -31,7 +34,7 @@ myServer = queryEndpointHandler
    queryEndpointHandler :: ByteString -> Handler NoContent
    queryEndpointHandler rawPath = do
      case rawPath of
-      "my-path-info-endpoint" -> do
+      "/my-path-info-endpoint" -> do
         liftIO $ print "Servant routed us to the right place!"
         pure NoContent
       _ -> do
