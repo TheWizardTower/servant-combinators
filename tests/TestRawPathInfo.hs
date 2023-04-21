@@ -12,8 +12,8 @@ import qualified Network.HTTP.Simple as S
 import qualified Test.Tasty.QuickCheck as QC
 
 type RawPathInfoAPI =
-  "merlin" :> "check-path-info" :> RawPathInfo :> Get '[JSON] NoContent
-  :<|> "check-path-info" :> RawPathInfo :> Get '[JSON] NoContent
+  "merlin" :> "check-raw-path-info" :> RawPathInfo :> Get '[JSON] NoContent
+  :<|> "check-raw-path-info" :> RawPathInfo :> Get '[JSON] NoContent
 
 rawPathInfoServer :: Server RawPathInfoAPI
 rawPathInfoServer = pathInfo :<|> pathInfo
@@ -21,18 +21,18 @@ rawPathInfoServer = pathInfo :<|> pathInfo
     pathInfo :: ByteString -> Handler NoContent
     pathInfo rPathInfo = do
       case rPathInfo of
-        "merlin/check-path-info" -> pure NoContent
+        "/merlin/check-raw-path-info" -> pure NoContent
         _ -> throwError err400 {errBody = "Merlin was not found in the path info list."}
 
 rawPathInfoProps :: Int -> TestTree
 rawPathInfoProps port =
   testGroup
     "RawPathInfo"
-    [ QC.testProperty "Requests to the merlin/check-path-info should succeed with a 200" $
+    [ QC.testProperty "Requests to the merlin/check-raw-path-info should succeed with a 200" $
         monadicIO $ do
           result <- (fetchEndpoint port "/merlin") >>= success
           assert $ result == True
-    , QC.testProperty "Requests to just /check-path-info should fail with a 400" $
+    , QC.testProperty "Requests to just /check-raw-path-info should fail with a 400" $
         monadicIO $ do
           result <- (fetchEndpoint port "") >>= returns400
           assert $ result == True
@@ -45,7 +45,7 @@ rawPathInfoProps port =
               "http://localhost:"
                 <> (show port')
                 <> urlPrefix
-                <> "/check-path-info"
+                <> "/check-raw-path-info"
           req = initReq {method = "GET"}
        in do
             resp <- S.httpBS req
