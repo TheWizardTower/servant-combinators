@@ -46,7 +46,9 @@ library:
   exposed-modules:
     - Servant.API.Cookies
     - Servant.API.HeaderList
+    - Servant.API.PathInfo
     - Servant.API.QueryString
+    - Servant.API.RawPathInfo
     - Servant.API.RawQueryString
     - Servant.API.RawRequest
 
@@ -70,6 +72,8 @@ tests:
       - TestCookies
       - TestHeaders
       - TestLib
+      - TestPathInfo
       - TestQueryString
+      - TestRawPathInfo
       - TestRawQueryString
       - TestRawRequest
