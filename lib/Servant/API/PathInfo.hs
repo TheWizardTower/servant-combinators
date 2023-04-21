@@ -10,13 +10,12 @@ import Servant
 import Servant.Server.Internal.Delayed (passToServer)
 
 {- |
-  @athInfo@ provides handlers access to the path segments from the
+  @PathInfo@ provides handlers access to the path segments from the
   request, without the domain name or query parameters. We re-generate
   this from the rawPathInfo via
   @Network.HTTP.Types.decodePathSegments@ because Servant removes all
   fields from the @pathInfo@ field of a request as part of routing the
   request to the appropriate handler.
-
 
   Example:
 
