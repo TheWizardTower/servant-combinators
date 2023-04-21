@@ -19,7 +19,7 @@ testFunctionGeneric server tests port = do
 success :: S.Response ByteString -> PropertyM IO Bool
 success resp = do
   let respCode = S.getResponseStatusCode resp
-      respBool = (respCode <= 200) && 299 >= respCode
+      respBool = respCode == 200
   pure respBool
 
 returns400 :: S.Response ByteString -> PropertyM IO Bool
