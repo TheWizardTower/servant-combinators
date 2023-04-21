@@ -1,5 +1,5 @@
 name: servant-combinators
-version: 0.0.1
+version: 0.0.2
 synopsis: Extra servant combinators for full WAI functionality.
 category: web
 description: Servant covers most of the data in a raw WAI request, but misses a few fields. This library aims to let handler authors get all the information about a request they need.
@@ -39,15 +39,6 @@ default-extensions:
   - TypeApplications
   - TypeFamilies
   - TypeOperators
-
-executables:
-  live-test:
-    source-dirs:
-      - src
-    main: LiveTest.hs
-    ghc-options:
-    - -threaded
-    other-modules: []
 
 library:
   source-dirs:
