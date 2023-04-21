@@ -16,13 +16,12 @@ testFunctionGeneric server tests port = do
     defaultMain $ tests port
     cancel serverAsync
 
+returnsWith :: Int -> S.Response ByteString -> PropertyM IO Bool
+returnsWith expectedResponse resp = do
+  pure $ expectedResponse == S.getResponseStatusCode resp
+
 success :: S.Response ByteString -> PropertyM IO Bool
-success resp = do
-  let respCode = S.getResponseStatusCode resp
-      respBool = respCode == 200
-  pure respBool
+success resp = returnsWith 200 resp
 
 returns400 :: S.Response ByteString -> PropertyM IO Bool
-returns400 resp = do
-  let respCode = S.getResponseStatusCode resp
-  pure $ respCode == 400
+returns400 resp = returnsWith 400 resp
